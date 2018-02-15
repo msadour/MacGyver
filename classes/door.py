@@ -1,5 +1,6 @@
 import pygame
 
+
 class Door(pygame.sprite.Sprite):
     def __init__(self, path_image, x, y):
        pygame.sprite.Sprite.__init__(self)

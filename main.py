@@ -5,7 +5,7 @@ import random
 
 pygame.init()
 
-#FIRST STEP : WE GET THE LABIRYNTHE FROM FILE
+# FIRST STEP : WE GET THE LABIRYNTHE FROM FILE
 
 field = pygame.display.set_mode((750, 750), RESIZABLE)
 background = pygame.Surface((field.get_size()))
@@ -17,10 +17,11 @@ labirynthe = labirynthe_file.read()
 
 # SECOND STEP : WE INISIALIZ LABIRYNTHE WITH BLOCK AND PLAYER
 
-pos_item_x = 0 #horizontale
-pos_item_y = 0 #verticale
+pos_item_x = 0 # horizontale
+pos_item_y = 0 # verticale
 block_list = pygame.sprite.Group()
-list_free_place_for_element = [] # this is used to have a list with free position (white case) on the field for put elements
+# list_free_place_for_element is used to have a list with free position (white case) on the field for put elements
+list_free_place_for_element = []
 
 for level in labirynthe.split("\n"):
     for item_level in level:
@@ -37,7 +38,7 @@ for level in labirynthe.split("\n"):
         elif item_level == 'P':
             my_door = door.Door('image/porte-ouverte.jpg', pos_item_x, pos_item_y+20)
             field.blit(my_door.image, my_door.rect)
-        else :
+        else:
             list_free_place_for_element.append((pos_item_x, pos_item_y))
         pos_item_x += 50
     pos_item_x=0
