@@ -1,7 +1,7 @@
 import pygame
 
-class MacGyver(pygame.sprite.Sprite):
 
+class MacGyver(pygame.sprite.Sprite):
     def __init__(self, path_image, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(path_image).convert_alpha()
@@ -33,7 +33,7 @@ class MacGyver(pygame.sprite.Sprite):
     def check_all_elements(self):
         """
         this method check if macgyver have all elements for kill the guard
-        :return:
+        :return: boolean
         """
         if len(self.equipment) == 3:
             print('Vous avez tout les elements necessaire pour tuer le guardien')
@@ -45,7 +45,7 @@ class MacGyver(pygame.sprite.Sprite):
         """
         add a element on the equipment of macgyver
         :param element:
-        :return:
+        :return: None
         """
         self.equipment.append(element)
 
