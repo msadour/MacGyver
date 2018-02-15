@@ -6,4 +6,4 @@ class Guard(pygame.sprite.Sprite):
         self.image = pygame.image.load(path_image).convert_alpha()
         self.elements = []
         self.is_win = False
-        self.rect = self.image.get_rect(center=(x, y+20))
+        self.rect = self.image.get_rect(center=(x, y))

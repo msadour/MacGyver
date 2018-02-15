@@ -1,15 +1,13 @@
 import pygame
 from pygame.locals import *
-import pickle
-import os
-from classes import block, macGyver, guard, element, white_rectangle
+from classes import block, macGyver, guard, element, white_rectangle, door
 import random
 
 pygame.init()
-#all_sprites = pygame.sprite.Group() # ship sprites + player sprite
 
 #FIRST STEP : WE GET THE LABIRYNTHE FROM FILE
-field = pygame.display.set_mode((750, 700), RESIZABLE)
+
+field = pygame.display.set_mode((750, 750), RESIZABLE)
 background = pygame.Surface((field.get_size()))
 background.fill((255, 255, 255))
 field.blit(background, (0,0))
@@ -18,11 +16,11 @@ labirynthe_file = open("labirynthe.txt", "r")
 labirynthe = labirynthe_file.read()
 
 # SECOND STEP : WE INISIALIZ LABIRYNTHE WITH BLOCK AND PLAYER
+
 pos_item_x = 0 #horizontale
 pos_item_y = 0 #verticale
-block_list = pygame.sprite.Group() # just ship sprites
-mac_gyver_list = pygame.sprite.Group()
-list_free_place_for_element = []
+block_list = pygame.sprite.Group()
+list_free_place_for_element = [] # this is used to have a list with free position (white case) on the field for put elements
 
 for level in labirynthe.split("\n"):
     for item_level in level:
@@ -33,10 +31,12 @@ for level in labirynthe.split("\n"):
         elif item_level == 'M':
             mac_gyver = macGyver.MacGyver('image/macgyver.png', pos_item_x, pos_item_y)
             field.blit(mac_gyver.image, mac_gyver.rect)
-            mac_gyver_list.add(mac_gyver)
         elif item_level == 'G':
             my_guard = guard.Guard('image/gardien.png', pos_item_x, pos_item_y)
             field.blit(my_guard.image, my_guard.rect)
+        elif item_level == 'P':
+            my_door = door.Door('image/porte-ouverte.jpg', pos_item_x, pos_item_y+20)
+            field.blit(my_door.image, my_door.rect)
         else :
             list_free_place_for_element.append((pos_item_x, pos_item_y))
         pos_item_x += 50
@@ -46,76 +46,55 @@ pygame.display.flip()
 
 # THIRD STEP : WE PUT THE TREE ELEMENTS IN FREE PLACE (IN RANDOM WHITE BLOCK)
 
-position_ether = random.choice(list_free_place_for_element)
-ether = element.Element('ether', 'image/ether.jpg', position_ether[0], position_ether[1])
-field.blit(ether.image, ether.rect)
-#I remove this position for be sure to don't have some position for differents elements
-list_free_place_for_element.remove(position_ether)
-
-position_needle = random.choice(list_free_place_for_element)
-needle = element.Element('aiguille', 'image/aiguille.jpg', position_needle[0], position_needle[1])
-field.blit(needle.image, needle.rect)
-list_free_place_for_element.remove(position_needle)
-
-position_tube = random.choice(list_free_place_for_element)
-tube = element.Element('tube', 'image/tube.jpg', position_tube[0], position_tube[1])
-field.blit(tube.image, tube.rect)
-list_free_place_for_element.remove(position_tube)
-pygame.display.flip()
+tube = element.Element('tube', 'image/tube.jpg')
+needle = element.Element('aiguille', 'image/aiguille.jpg')
+ether = element.Element('ether', 'image/ether.jpg')
 
 list_elements = [tube, needle, ether]
 
+for e in list_elements:
+    position = random.choice(list_free_place_for_element) #get a random position on the field
+    e.rect = e.image.get_rect(center=(position[0], position[1]))
+    field.blit(e.image, e.rect)
+    list_free_place_for_element.remove(position) #remove the random position for not have 2 elements in same place
+    pygame.display.flip()
+
+# FOURTH STEP : STARTING THE GAME
+
 pygame.key.set_repeat(400, 50)
-rectangle = None
-#collided_element = lambda m, l : m.check_collision_element(l)
+rectangle = None # This rectangle is used to avoid repetitions of macgyver drawing after moving
 in_game = True
 while in_game:
-    for event in pygame.event.get():  # On parcours la liste de tous les événements reçus
-        if event.type == QUIT:  # Si un de ces événements est de type QUIT
+    for event in pygame.event.get():
+        if event.type == QUIT:
             break
         if event.type == KEYDOWN:
             old_position = mac_gyver.rect
+            mac_gyver.move(event.key, block_list)
 
-            if event.key == K_DOWN:
-                mac_gyver.rect = mac_gyver.rect.move(0, 10)
-                if mac_gyver.check_collision(block_list):
-                    mac_gyver.rect = mac_gyver.rect.move(0, -10)
-                rectangle = white_rectangle.RectWhite((40, 45), old_position)
-
-            if event.key == K_UP:
-                mac_gyver.rect = mac_gyver.rect.move(0, -10)
-                if mac_gyver.check_collision(block_list):
-                    mac_gyver.rect = mac_gyver.rect.move(0,10)
-                rectangle = white_rectangle.RectWhite((40, 45), old_position)
-
-            if event.key == K_LEFT:
-                mac_gyver.rect = mac_gyver.rect.move(-10, 0)
-                if mac_gyver.check_collision(block_list):
-                    mac_gyver.rect = mac_gyver.rect.move(10, 0)
-                rectangle = white_rectangle.RectWhite((40, 45), old_position)
-
-            if event.key == K_RIGHT:
-                mac_gyver.rect = mac_gyver.rect.move(10, 0)
-                if mac_gyver.check_collision(block_list):
-                    mac_gyver.rect = mac_gyver.rect.move(-10, 0)
-                rectangle = white_rectangle.RectWhite((40, 45), old_position)
-
+            # we check if macgyver is collided with a element on the field
             for e in list_elements:
                 if  pygame.sprite.collide_rect(mac_gyver, e):
-                    if e not in mac_gyver.elements:
+                    if e not in mac_gyver.equipment:
                         mac_gyver.add_element(e)
+                        print('Vous possedez desormais : ' + e.name)
 
+            # we check if macgyver is collided with the guard
             if pygame.sprite.collide_rect(mac_gyver, my_guard):
-                if mac_gyver.check_win():
-                    print('felicitation vous avez gagné !')
+                if mac_gyver.check_all_elements():
+                    pass
                 else:
                     print('vous avez perdu !')
+                    in_game = False
+
+            # we check if macgyver is open the door. In this case, you win
+            if pygame.sprite.collide_rect(mac_gyver, my_door):
+                print('vous avez gagné !')
                 in_game = False
 
+            rectangle = white_rectangle.RectWhite((40, 45), old_position)
             rectangle.fill((255, 255, 255))
             field.blit(rectangle, old_position)
     field.blit(mac_gyver.image, mac_gyver.rect)
 
-    pygame.display.update()
-    # Rafraichissement
     pygame.display.flip()
