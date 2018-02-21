@@ -1,5 +1,5 @@
 """
-Contain the class for initalize a white rectangle when macgyver move.
+Contain the class for initialize a white rectangle when macgyver move.
 """
 
 import pygame
@@ -34,7 +34,6 @@ class RectWhite(pygame.Surface):
         :return:
         """
         return self.position
-
 
     def get_size(self):
         """

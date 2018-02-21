@@ -1,9 +1,9 @@
 """
-Contain the class for initalize macgyver on the labirynthe.
+Contain the class for initialize macgyver on the labyrinth.
 """
 
 import pygame
-import constante
+from constante import LEFT, RIGHT, UP, DOWN
 
 
 class MacGyver(pygame.sprite.Sprite):
@@ -66,19 +66,19 @@ class MacGyver(pygame.sprite.Sprite):
         """
         new_position = (0, 0)
         old_position = (0, 0)
-        if direction == constante.RIGHT:
+        if direction == RIGHT:
             new_position = (50, 0)
             old_position = (-50, 0)
 
-        elif direction == constante.LEFT:
+        elif direction == LEFT:
             new_position = (-50, 0)
             old_position = (50, 0)
 
-        elif direction == constante.UP:
+        elif direction == UP:
             new_position = (0, -50)
             old_position = (0, 50)
 
-        elif direction == constante.DOWN:
+        elif direction == DOWN:
             new_position = (0, 50)
             old_position = (0, -50)
 

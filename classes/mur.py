@@ -1,5 +1,5 @@
 """
-Contain the class for initalize a wall on the labirynthe.
+Contain the class for initialize a wall on the labyrinth.
 """
 
 import pygame

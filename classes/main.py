@@ -3,35 +3,35 @@ Contain the class for run the game
 """
 
 import random
-import constante
-from classes import mac_gyver, guard, element, white_rectangle, door, mur, message
-import time
 import pygame
-from pygame.locals import *
+from pygame.locals import RESIZABLE, QUIT, KEYDOWN, MOUSEBUTTONUP
+from . import mac_gyver, garde, element, white_rectangle, porte, mur, menu
 
-class Main():
+
+class Main:
     """
     Class Main
     """
 
-    def run(self):
+    @staticmethod
+    def run():
         """
         Run the game
         :return:
         """
         pygame.init()
 
-        # FIRST STEP : WE GET THE LABIRYNTHE FROM FILE
+        # FIRST STEP : WE GET THE LABYRINTH FROM FILE
 
         field = pygame.display.set_mode((750, 750), RESIZABLE)
         background = pygame.Surface(field.get_size())
-        background.fill(constante.WHITE)
+        background.fill((255, 255, 255))
         field.blit(background, (0, 0))
 
-        labirynthe_file = open("labirynthe.txt", "r")
-        labirynthe = labirynthe_file.read()
+        labyrinth_file = open("labyrinthe.txt", "r")
+        labyrinth = labyrinth_file.read()
 
-        # SECOND STEP : WE INIIALIZE LABIRYNTHE WITH WALL AND PLAYER
+        # SECOND STEP : WE INITIALIZE LABYRINTH WITH WALL AND PLAYER
 
         pos_item_x = 0  # horizontale
         pos_item_y = 0  # verticale
@@ -40,7 +40,7 @@ class Main():
         # on the field for put elements
         list_free_place_for_element = []
 
-        for level in labirynthe.split("\n"):
+        for level in labyrinth.split("\n"):
             for item_level in level:
                 if item_level == '0':
                     my_wall = mur.Wall(pos_item_x, pos_item_y)
@@ -50,10 +50,10 @@ class Main():
                     macgyver = mac_gyver.MacGyver('image/macgyver.png', pos_item_x, pos_item_y)
                     field.blit(macgyver.image, macgyver.rect)
                 elif item_level == 'G':
-                    my_guard = guard.Guard('image/gardien.png', pos_item_x, pos_item_y)
+                    my_guard = garde.Guard('image/gardien.png', pos_item_x, pos_item_y)
                     field.blit(my_guard.image, my_guard.rect)
                 elif item_level == 'P':
-                    my_door = door.Door('image/porte-ouverte.jpg', pos_item_x, pos_item_y + 20)
+                    my_door = porte.Door('image/porte-ouverte.jpg', pos_item_x, pos_item_y - 40)
                     field.blit(my_door.image, my_door.rect)
                 else:
                     list_free_place_for_element.append((pos_item_x, pos_item_y))
@@ -85,11 +85,8 @@ class Main():
         level_sound = 0.05
         backgroud_music.set_volume(level_sound)
         backgroud_music.play(loops=100)
-
-        pygame.key.set_repeat(400, 50)
-        # This rectangle is used to avoid repetitions of macgyver drawing after moving
-        rectangle = None
         in_game = True
+        pygame.key.set_repeat(400, 50)
         while in_game:
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -109,27 +106,43 @@ class Main():
 
                     # we check if macgyver is collided with the guard
                     if pygame.sprite.collide_rect(macgyver, my_guard):
-                        if macgyver.check_all_elements():
-                            pass
-                        else:
-                            my_message = message.Message()
-                            my_message.add_rect()
-                            my_message.add_text('vous avez perdu !')
-                            time.sleep(5)
+                        if not macgyver.check_all_elements():
+                            answer = Main.ending_menu(text='vous avez perdu !')
                             in_game = False
 
                     # we check if macgyver is open the door. In this case, you win
                     if pygame.sprite.collide_rect(macgyver, my_door):
-                        if len(macgyver.equipment) == 3:
-                            my_message = message.Message()
-                            my_message.add_rect()
-                            my_message.add_text('vous avez gagné !')
-                            time.sleep(5)
-                            in_game = False
+                        answer = Main.ending_menu(text='vous avez gagné !')
+                        in_game = False
 
                     rectangle = white_rectangle.RectWhite((40, 45), old_position)
-                    rectangle.fill(constante.WHITE)
+                    rectangle.fill((255, 255, 255))
                     field.blit(rectangle, old_position)
             field.blit(macgyver.image, macgyver.rect)
 
             pygame.display.flip()
+        if answer == 'recommencer':
+            backgroud_music.stop()
+            Main.run()
+
+    @staticmethod
+    def ending_menu(text):
+        """
+        This method create the endin menu for choose if we want play again or exit.
+        :param text: depend if we win or lose.
+        :return:
+        """
+        my_message = menu.Menu()
+        my_message.add_rect()
+        my_message.add_text(text)
+        choice_choosed = False
+        while not choice_choosed:
+            for event in pygame.event.get():
+                if event.type == MOUSEBUTTONUP:
+                    if event.pos[1] >= 204 or event.pos[1] <= 225:
+                        if event.pos[0] >= 99 and event.pos[0] <= 225:
+                            # On recommence
+                            return 'recommencer'
+                        elif event.pos[0] >= 395 and event.pos[0] <= 460:
+                            # On quitte
+                            return None
