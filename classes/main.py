@@ -82,7 +82,7 @@ class Main:
         # FOURTH STEP : STARTING THE GAME
 
         backgroud_music = pygame.mixer.Sound("musique_fond.wav")
-        level_sound = 0.05
+        level_sound = 0.00
         backgroud_music.set_volume(level_sound)
         backgroud_music.play(loops=100)
         in_game = True
@@ -128,7 +128,7 @@ class Main:
     @staticmethod
     def ending_menu(text):
         """
-        This method create the endin menu for choose if we want play again or exit.
+        This method create the ending menu for choose if we want play again or exit.
         :param text: depend if we win or lose.
         :return:
         """
@@ -139,10 +139,10 @@ class Main:
         while not choice_choosed:
             for event in pygame.event.get():
                 if event.type == MOUSEBUTTONUP:
-                    if event.pos[1] >= 204 or event.pos[1] <= 225:
-                        if event.pos[0] >= 99 and event.pos[0] <= 225:
+                    if event.pos[1] in range(204, 228):
+                        if event.pos[0] in range(99, 225):
                             # On recommence
                             return 'recommencer'
-                        elif event.pos[0] >= 395 and event.pos[0] <= 460:
+                        elif event.pos[0] in range(395, 460):
                             # On quitte
                             return None
