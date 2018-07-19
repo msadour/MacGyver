@@ -21,18 +21,17 @@ class Main:
         """
         pygame.init()
 
-        # FIRST STEP : WE GET THE LABYRINTH FROM FILE
+        # FIRST STEP : WE CREATE A EMPTY FIELD
 
         field = pygame.display.set_mode((750, 750), RESIZABLE)
         background = pygame.Surface(field.get_size())
         background.fill((255, 255, 255))
         field.blit(background, (0, 0))
 
-        labyrinth_file = open("labyrinthe.txt", "r")
-        labyrinth = labyrinth_file.read()
-
         # SECOND STEP : WE INITIALIZE LABYRINTH WITH WALL AND PLAYER
 
+        labyrinth_file = open("labyrinthe.txt", "r")
+        labyrinth = labyrinth_file.read()
         pos_item_x = 0  # horizontale
         pos_item_y = 0  # verticale
         wall_list = pygame.sprite.Group()
@@ -75,14 +74,14 @@ class Main:
             position = random.choice(list_free_place_for_element)
             a_element.rect = a_element.image.get_rect(center=(position[0], position[1]))
             field.blit(a_element.image, a_element.rect)
-            # remove the random position for not have 2 elements in same place
+            # remove the random position for avoid to have 2 elements in same place
             list_free_place_for_element.remove(position)
             pygame.display.flip()
 
         # FOURTH STEP : STARTING THE GAME
 
         backgroud_music = pygame.mixer.Sound("musique_fond.wav")
-        level_sound = 0.00
+        level_sound = 0.05
         backgroud_music.set_volume(level_sound)
         backgroud_music.play(loops=100)
         in_game = True
