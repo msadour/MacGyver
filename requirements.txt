@@ -1,4 +1,4 @@
-certifi==2018.1.18
+certifi==2022.12.7
 numpy==1.13.3
 pyasn1==0.4.2
 Cython==0.28.4
